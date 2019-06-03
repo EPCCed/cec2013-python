@@ -15,40 +15,40 @@ class CF4(cf.CFunction):
         super(CF4, self).__init__(dim, 8)
 
         # Initialize data for composition
-        self._CFunction__sigma_ = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0])
-        self._CFunction__bias_ = np.zeros(self._CFunction__nofunc_)
-        self._CFunction__weight_ = np.zeros(self._CFunction__nofunc_)
-        self._CFunction__lambda_ = np.array([4.0, 1.0, 4.0, 1.0, 1.0/10.0, 1.0/5.0, 1.0/10.0, 1.0/40.0])
+        self._sigma = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0])
+        self._bias = np.zeros(self._nofunc)
+        self._weight = np.zeros(self._nofunc)
+        self._lambda = np.array([4.0, 1.0, 4.0, 1.0, 1.0/10.0, 1.0/5.0, 1.0/10.0, 1.0/40.0])
 
         # Lower/Upper Bounds
         self._CFunction__lbound_ = -5.0 * np.ones(dim)
         self._CFunction__ubound_ = 5.0 * np.ones(dim)
 
         if self.o.shape[1] >= dim:
-            self._CFunction__O_ = self.o[:self._CFunction__nofunc_, :dim]
+            self._O = self.o[:self._nofunc, :dim]
         else:  # randomly initialize
-            self._CFunction__O_ = self._CFunction__lbound_ + (self._CFunction__ubound_ - self._CFunction__lbound_) * np.random.rand((self._CFunction__nofunc_, dim))
+            self._O = self._lbound + (self._ubound - self._lbound) * np.random.rand((self._nofunc, dim))
 
         # Load M_: Rotation matrices
         if dim in (2, 3, 5, 10, 20):
             fname = self.function_data_file(4, dim)  # os.path.join(my_path, "data/CF4_M_D{}.dat".format(dim))
-            self._CFunction__load_rotmat(fname)
+            self._load_rotmat(fname)
         else:
             # M_ Identity matrices # TODO: Generate dimension independent rotation matrices
-            self._CFunction__M_ = [np.eye(dim)] * self._CFunction__nofunc_
+            self._M = [np.eye(dim)] * self._nofunc
 
         # Initialize functions of the composition
-        self._CFunction__function_ = {0: cf.FRastrigin,
-                                      1: cf.FRastrigin,
-                                      2: cf.FEF8F2,
-                                      3: cf.FEF8F2,
-                                      4: cf.FWeierstrass,
-                                      5: cf.FWeierstrass,
-                                      6: cf.FGrienwank,
-                                      7: cf.FGrienwank}
+        self._function = {0: cf.rastrigin,
+                          1: cf.rastrigin,
+                          2: cf.fef8f2,
+                          3: cf.fef8f2,
+                          4: cf.weierstrass,
+                          5: cf.weierstrass,
+                          6: cf.grienwank,
+                          7: cf.grienwank}
 
         # Calculate fmaxi
-        self._CFunction__calculate_fmaxi()
+        self._calculate_fmaxi()
 
     def evaluate(self, x):
-        return self._CFunction__evaluate_inner_(x)
+        return self._evaluate_inner(x)

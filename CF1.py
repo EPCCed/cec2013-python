@@ -15,34 +15,34 @@ class CF1(cf.CFunction):
         super(CF1, self).__init__(dim, 6)
 
         # Initialize data for composition
-        self._CFunction__sigma_ = np.ones(self._CFunction__nofunc_)
-        self._CFunction__bias_ = np.zeros(self._CFunction__nofunc_)
-        self._CFunction__weight_ = np.zeros(self._CFunction__nofunc_)
-        self._CFunction__lambda_ = np.array([1.0, 1.0, 8.0, 8.0, 1.0/5.0, 1.0/5.0])
+        self._sigma = np.ones(self._nofunc)
+        self._bias = np.zeros(self._nofunc)
+        self._weight = np.zeros(self._nofunc)
+        self._lambda = np.array([1.0, 1.0, 8.0, 8.0, 1.0/5.0, 1.0/5.0])
 
         # Lower/Upper Bounds
-        self._CFunction__lbound_ = -5.0 * np.ones(dim)
-        self._CFunction__ubound_ = 5.0 * np.ones(dim)
+        self._lbound = -5.0 * np.ones(dim)
+        self._ubound = 5.0 * np.ones(dim)
 
         # Load optima
         if self.o.shape[1] >= dim:
-            self._CFunction__O_ = self.o[:self._CFunction__nofunc_, :dim]
+            self._O = self.o[:self._nofunc, :dim]
         else:  # randomly initialize
-            self._CFunction__O_ = self._CFunction__lbound_ + (self._CFunction__ubound_ - self._CFunction__lbound_) * np.random.rand((self._CFunction__nofunc_, dim))
+            self._O = self._lbound + (self._ubound - self._lbound) * np.random.rand((self._nofunc, dim))
 
         # M_: Identity matrices
-        self._CFunction__M_ = [np.eye(dim)] * self._CFunction__nofunc_
+        self._M = [np.eye(dim)] * self._nofunc
 
         # Initialize functions of the composition
-        self._CFunction__function_ = {0: cf.FGrienwank,
-                                      1: cf.FGrienwank,
-                                      2: cf.FWeierstrass,
-                                      3: cf.FWeierstrass,
-                                      4: cf.FSphere,
-                                      5: cf.FSphere}
+        self._function = {0: cf.grienwank,
+                          1: cf.grienwank,
+                          2: cf.weierstrass,
+                          3: cf.weierstrass,
+                          4: cf.sphere,
+                          5: cf.sphere}
 
         # Calculate fmaxi
-        self._CFunction__calculate_fmaxi()
+        self._calculate_fmaxi()
 
     def evaluate(self, x):
-        return self._CFunction__evaluate_inner_(x)
+        return self._evaluate_inner(x)

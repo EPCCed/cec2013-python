@@ -174,6 +174,7 @@ def modified_rastrigin_all(x=None):
 
     result = 0
     dimensions = len(x)
+    k = None
     if dimensions == 2:
         k = [3, 4]
     elif dimensions == 8:

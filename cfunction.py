@@ -16,27 +16,27 @@ MINMAX = -1		# Maximization
 
 
 class CFunction(object):
-    __dim_ = -1
-    __nofunc_ = -1
-    __C_ = 2000.0
-    __lambda_ = None
-    __sigma_ = None
-    __bias_ = None
-    __O_ = None
-    __M_ = None
-    __weight_ = None
-    __lbound_ = None
-    __ubound_ = None
-    __fi_ = None
-    __z_ = None
-    __f_bias_ = 0
-    __fmaxi_ = None
-    __tmpx_ = None
-    __function_ = None
+    _dim = -1
+    _nofunc = -1
+    _C = 2000.0
+    _lambda = None
+    _sigma = None
+    _bias = None
+    _O = None
+    _M = None
+    _weight = None
+    _lbound = None
+    _ubound = None
+    _fi = None
+    _z = None
+    _f_bias = 0
+    _fmaxi = None
+    _tmpx = None
+    _function = None
 
     def __init__(self, dim, nofunc):
-        self.__dim_ = dim
-        self.__nofunc_ = nofunc
+        self._dim = dim
+        self._nofunc = nofunc
 
         # Load optima
         self.path = os.path.abspath(os.path.dirname(__file__))
@@ -50,78 +50,78 @@ class CFunction(object):
         pass
 
     def get_lbound(self, ivar):
-        assert 0 <= ivar < self.__dim_, ["ivar is not in valid variable range: %d not in [0,%d]" % ivar, self.__dim_]
-        return self.__lbound_[ivar]
+        assert 0 <= ivar < self._dim, ["ivar is not in valid variable range: %d not in [0,%d]" % ivar, self._dim]
+        return self._lbound[ivar]
 
     def get_ubound(self, ivar):
-        assert 0 <= ivar < self.__dim_, ["ivar is not in valid variable range: %d not in [0,%d]" % ivar, self.__dim_]
-        return self.__ubound_[ivar]
+        assert 0 <= ivar < self._dim, ["ivar is not in valid variable range: %d not in [0,%d]" % ivar, self._dim]
+        return self._ubound[ivar]
 
-    def __evaluate_inner_(self, x):
-        if self.__function_ is None:
+    def _evaluate_inner(self, x):
+        if self._function is None:
             raise NameError('Composition functions\' dict is uninitialized')
-        self.__fi_ = np.zeros(self.__nofunc_)
+        self._fi = np.zeros(self._nofunc)
 
-        self.__calculate_weights(x)
-        for i in range(self.__nofunc_):
-            self.__transform_to_z(x, i)
-            self.__fi_[i] = self.__function_[i](self.__z_)
+        self._calculate_weights(x)
+        for i in range(self._nofunc):
+            self._transform_to_z(x, i)
+            self._fi[i] = self._function[i](self._z)
 
-        tmpsum = np.zeros(self.__nofunc_)
-        for i in range(self.__nofunc_):
-            tmpsum[i] = self.__weight_[i] * (self.__C_ * self.__fi_[i] / self.__fmaxi_[i] + self.__bias_[i])
+        tmpsum = np.zeros(self._nofunc)
+        for i in range(self._nofunc):
+            tmpsum[i] = self._weight[i] * (self._C * self._fi[i] / self._fmaxi[i] + self._bias[i])
 
-        return sum(tmpsum) * MINMAX + self.__f_bias_
+        return sum(tmpsum) * MINMAX + self._f_bias
 
-    def __calculate_weights(self, x):
-        self.__weight_ = np.zeros(self.__nofunc_)
-        for i in range(self.__nofunc_):
-            mysum = sum((x-self.__O_[i])**2)
-            self.__weight_[i] = np.exp(-mysum/(2.0 * self.__dim_ * self.__sigma_[i] * self.__sigma_[i]))
-        maxw = np.max(self.__weight_)
-        # maxi = self.__weight_.argmax(axis=0)
+    def _calculate_weights(self, x):
+        self._weight = np.zeros(self._nofunc)
+        for i in range(self._nofunc):
+            mysum = sum((x-self._O[i])**2)
+            self._weight[i] = np.exp(-mysum/(2.0 * self._dim * self._sigma[i] * self._sigma[i]))
+        maxw = np.max(self._weight)
+        # maxi = self._weight.argmax(axis=0)
 
         maxw10 = maxw**10
-        for i in range(self.__nofunc_):
-            if self.__weight_[i] != maxw:
+        for i in range(self._nofunc):
+            if self._weight[i] != maxw:
                 # if i != maxi:
-                self.__weight_[i] = self.__weight_[i] * (1.0 - maxw10)
+                self._weight[i] = self._weight[i] * (1.0 - maxw10)
 
-        mysum = np.sum(self.__weight_)
-        for i in range(self.__nofunc_):
+        mysum = np.sum(self._weight)
+        for i in range(self._nofunc):
             if mysum == 0.0:
-                self.__weight_[i] = 1.0 / (1.0 * self.__nofunc_)
+                self._weight[i] = 1.0 / (1.0 * self._nofunc)
             else:
-                self.__weight_[i] = self.__weight_[i] / mysum
+                self._weight[i] = self._weight[i] / mysum
 
-    def __calculate_fmaxi(self):
-        self.__fmaxi_ = np.zeros(self.__nofunc_)
-        if self.__function_ is None:
+    def _calculate_fmaxi(self):
+        self._fmaxi = np.zeros(self._nofunc)
+        if self._function is None:
             raise NameError('Composition functions\' dict is uninitialized')
 
-        x5 = 5 * np.ones(self.__dim_)
+        x5 = 5 * np.ones(self._dim)
 
-        for i in range(self.__nofunc_):
-            self.__transform_to_z_noshift(x5, i)
-            self.__fmaxi_[i] = self.__function_[i](self.__z_)
+        for i in range(self._nofunc):
+            self._transform_to_z_noshift(x5, i)
+            self._fmaxi[i] = self._function[i](self._z)
 
-    def __transform_to_z_noshift(self, x, index):
+    def _transform_to_z_noshift(self, x, index):
         # z_i = (x)/\lambda_i
-        tmpx = np.divide(x, self.__lambda_[index])
+        tmpx = np.divide(x, self._lambda[index])
         # Multiply z_i * M_i
-        self.__z_ = np.dot(tmpx, self.__M_[index])
+        self._z = np.dot(tmpx, self._M[index])
 
-    def __transform_to_z(self, x, index):
+    def _transform_to_z(self, x, index):
         # Calculate z_i = (x - o_i)/\lambda_i
-        tmpx = np.divide((x - self.__O_[index]), self.__lambda_[index])
+        tmpx = np.divide((x - self._O[index]), self._lambda[index])
         # Multiply z_i * M_i
-        self.__z_ = np.dot(tmpx, self.__M_[index])
+        self._z = np.dot(tmpx, self._M[index])
 
-    def __load_rotmat(self, fname):
-        self.__M_ = []
+    def _load_rotmat(self, fname):
+        self._M = []
 
         with open(fname, 'r') as f:
-            tmp = np.zeros((self.__dim_, self.__dim_))
+            tmp = np.zeros((self._dim, self._dim))
             cline = 0
             ctmp = 0
             for line in f:
@@ -129,40 +129,40 @@ class CFunction(object):
                 if line:
                     line = [float(i) for i in line]
                     # re initialize array when reached dim
-                    if ctmp % self.__dim_ == 0:
-                        tmp = np.zeros((self.__dim_, self.__dim_))
+                    if ctmp % self._dim == 0:
+                        tmp = np.zeros((self._dim, self._dim))
                         ctmp = 0
 
                     # add line to tmp
-                    tmp[ctmp] = line[:self.__dim_]
-                    # if we loaded self.__nofunc_ * self.__dim_-1 lines break
-                    if cline >= self.__nofunc_ * self.__dim_-1:
+                    tmp[ctmp] = line[:self._dim]
+                    # if we loaded self._nofunc * self._dim-1 lines break
+                    if cline >= self._nofunc * self._dim-1:
                         break
-                    # add array to M_ when it is fully created
-                    if cline % self.__dim_ == 0:
-                        self.__M_.append(tmp)
+                    # add array to _M when it is fully created
+                    if cline % self._dim == 0:
+                        self._M.append(tmp)
                     ctmp = ctmp + 1
                     cline = cline + 1
 
 
 # Sphere function
-def FSphere(x):
+def sphere(x):
     return (x**2).sum()
 
 
 # Rastrigin's function
-def FRastrigin(x):
+def rastrigin(x):
     return np.sum(x**2-10.*np.cos(2.*np.pi*x)+10)
 
 
 # Griewank's function
-def FGrienwank(x):
+def grienwank(x):
     i = np.sqrt(np.arange(x.shape[0])+1.0)
     return np.sum(x**2)/4000.0 - np.prod(np.cos(x/i)) + 1.0
 
 
 # Weierstrass's function
-def FWeierstrass(x):
+def weierstrass(x):
     alpha = 0.5
     beta = 3.0
     kmax = 20
@@ -179,16 +179,16 @@ def FWeierstrass(x):
     return f + c
 
 
-def F8F2(x):
+def f8f2(x):
     f2 = 100.0 * (x[0]**2 - x[1])**2 + (1.0 - x[0])**2
     return 1.0 + (f2**2)/4000.0 - np.cos(f2)
 
 
 # FEF8F2 function
-def FEF8F2(x):
+def fef8f2(x):
     dimensions = x.shape[0]
     f = 0
     for i in range(dimensions-1):
-        f += F8F2(x[[i, i+1]] + 1)
-    f += F8F2(x[[dimensions-1, 0]] + 1)
+        f += f8f2(x[[i, i+1]] + 1)
+    f += f8f2(x[[dimensions-1, 0]] + 1)
     return f

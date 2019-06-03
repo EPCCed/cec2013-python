@@ -21,8 +21,8 @@ class CF4(cf.CFunction):
         self._lambda = np.array([4.0, 1.0, 4.0, 1.0, 1.0/10.0, 1.0/5.0, 1.0/10.0, 1.0/40.0])
 
         # Lower/Upper Bounds
-        self._CFunction__lbound_ = -5.0 * np.ones(dim)
-        self._CFunction__ubound_ = 5.0 * np.ones(dim)
+        self._lbound = -5.0 * np.ones(dim)
+        self._ubound = 5.0 * np.ones(dim)
 
         if self.o.shape[1] >= dim:
             self._O = self.o[:self._nofunc, :dim]

@@ -26,7 +26,8 @@ class CF3(cf.CFunction):
         if self.o.shape[1] >= dim:
             self._O = self.o[:self._nofunc, :dim]
         else:  # randomly initialize
-            self._O = self._lbound + (self._ubound - self._lbound) * np.random.rand((self._nofunc, dim))
+            self._O = self._lbound + \
+                      (self._ubound - self._lbound) * np.random.rand((self._nofunc, dim))
 
         # Load M_: Rotation matrices
         if dim in (2, 3, 5, 10, 20):

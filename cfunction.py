@@ -19,24 +19,25 @@ class CFunction(object):
     _dim = -1
     _nofunc = -1
     _C = 2000.0
-    _lambda = None
-    _sigma = None
-    _bias = None
-    _O = None
     _M = None
     _weight = None
-    _lbound = None
-    _ubound = None
     _fi = None
     _z = None
     _f_bias = 0
     _fmaxi = None
     _tmpx = None
-    _function = None
 
     def __init__(self, dim, nofunc):
         self._dim = dim
         self._nofunc = nofunc
+
+        self._lbound = []
+        self._ubound = []
+        self._O = []
+        self._lambda = []
+        self._function = []
+        self._bias = []
+        self._sigma = []
 
         # Load optima
         self.path = os.path.abspath(os.path.dirname(__file__))
@@ -59,7 +60,7 @@ class CFunction(object):
 
     def _evaluate_inner(self, x):
         if self._function is None:
-            raise NameError('Composition functions\' dict is uninitialized')
+            raise NameError("Composition functions' dict is uninitialized")
         self._fi = np.zeros(self._nofunc)
 
         self._calculate_weights(x)

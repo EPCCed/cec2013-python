@@ -28,7 +28,8 @@ class CF1(cf.CFunction):
         if self.o.shape[1] >= dim:
             self._O = self.o[:self._nofunc, :dim]
         else:  # randomly initialize
-            self._O = self._lbound + (self._ubound - self._lbound) * np.random.rand((self._nofunc, dim))
+            self._O = self._lbound + \
+                      (self._ubound - self._lbound) * np.random.rand((self._nofunc, dim))
 
         # M_: Identity matrices
         self._M = [np.eye(dim)] * self._nofunc

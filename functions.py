@@ -76,7 +76,7 @@ def himmelblau(x=None):
 
     """
         F4: Himmelblau
-        Variable ranges: x, y in [-6, 6
+        Variable ranges: x, y in [-6, 6]
         No. of global peaks: 4
         No. of local peaks:  0.
     """

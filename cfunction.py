@@ -50,10 +50,16 @@ class CFunction(object):
     def evaluate(self, x):
         pass
 
+    #
+    # n.b. get_lbound / get_ubound don't appear to be used in current codebase
+    #
+
+    # try / except (IndexError) would be more pythonic to check rather than assert
     def get_lbound(self, ivar):
         assert 0 <= ivar < self._dim, ["ivar is not in valid variable range: %d not in [0,%d]" % ivar, self._dim]
         return self._lbound[ivar]
 
+    # try / except (IndexError) would be more pythonic to check rather than assert
     def get_ubound(self, ivar):
         assert 0 <= ivar < self._dim, ["ivar is not in valid variable range: %d not in [0,%d]" % ivar, self._dim]
         return self._ubound[ivar]
